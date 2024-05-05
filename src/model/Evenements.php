@@ -7,6 +7,7 @@ class Evenement {
     private $date;
     private $description;
     private $nb_places;
+    private $image; 
 
     public function __construct(array $donnees) {
         $this->hydrater($donnees);
@@ -41,6 +42,10 @@ class Evenement {
         $this->nb_places = $nb_places;
     }
 
+    public function setImage(string $image) {
+        $this->image = $image;
+    }
+
     public function getId_evenements() {
         return $this->id_evenements;
     }
@@ -60,5 +65,8 @@ class Evenement {
     public function getNb_places() {
         return $this->nb_places;
     }
+
+    public function getImage() {
+        return $this->image;
+    }
 }
-?>

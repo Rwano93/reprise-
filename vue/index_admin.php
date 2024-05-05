@@ -15,7 +15,7 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil</title>
+    <title>Administration des événements</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -161,84 +161,62 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
-<div class="popup" id="popup">
-        <h3>Confirmation</h3>
-        <p><?php echo $message; ?></p>
-        <button onclick="closePopup()">Fermer</button>
-    </div>
-    <div class="overlay" id="overlay"></div>
-        <div class="container">
-            
-            <div class="sidebar">
-                <h2>Menu</h2>
-                <ul>
-                    <li><a href="index.php">Evenements</a></li>
-                    <li><a href="Historique.php">Historique d'événements</a></li>
-                    <li><a href="connexion.html">Déconnexion</a></li>
-                </ul>
-            </div>
+    <h1>Administration des événements</h1>
 
-            <!-- Contenu principal -->
-            <div class="content">
-                <h1>Événements</h1>
-                
-                <!-- Affichage des événements depuis la base de données -->
-                <?php foreach ($evenements as $evenement): ?>
-                <div class="event">
-                    <!-- Détails de l'événement -->
-                    <div class="event-details">
-                        <h2><?php echo $evenement['titre']; ?></h2>
-                        <p><?php echo $evenement['description']; ?></p>
-                        <p>Date: <?php echo $evenement['date']; ?></p>
-                        <button onclick="openPopup('inscriptionPopup')">Inscription</button>
-                    </div>
-                    <!-- Image de l'événement -->
-                    <div class="event-image">
-                        <img src="<?php echo $evenement['image']; ?>" alt="Image de l'événement">
-                    </div>
-                </div>
-                <?php endforeach; ?>
+    <!-- Ajout d'un événement -->
+    <h2>Ajouter un événement</h2>
+    <form action="ajouter_evenement.php" method="post" enctype="multipart/form-data">
+        <!-- Champs pour les détails de l'événement -->
+        <label for="titre">Titre :</label>
+        <input type="text" id="titre" name="titre" required><br>
+        <label for="date">Date :</label>
+        <input type="date" id="date" name="date" required><br>
+        <label for="description">Description :</label>
+        <input type="text" id="description" name="description" required><br>
+        <label for="nb_places">Nombre de places :</label>
+        <input type="number" id="nb_places" name="nb_places" required><br>
+        <label for="image">Image :</label>
+        <input type="file" id="image" name="image" accept="image/*" required><br>
+        <input type="submit" value="Ajouter">
+    </form>
 
-                <!-- Formulaire d'inscription dans un pop-up -->
-                <div id="inscriptionPopup" class="popup" style="display: none;">
-                    <div class="popup-content">
-                        <h2>S'inscrire à un événement</h2>
-                        <form action="#" method="post">
-                            <label for="name">Nom:</label>
-                            <input type="text" id="name" name="name" required>
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required>
-                            <label for="event">Choisir un événement:</label>
-                            <select id="event" name="event" required>
-                                <?php foreach ($evenements as $evenement): ?>
-                                <option value="<?php echo $evenement['id_evenements']; ?>"><?php echo $evenement['titre']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input type="submit" value="S'inscrire">
-                        </form>
-                        <button onclick="closePopup('inscriptionPopup')">Fermer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        function openPopup() {
-            document.getElementById("popup").style.display = "block";
-            document.getElementById("overlay").style.display = "block";
-        }
+    <!-- Modification d'un événement -->
+    <h2>Modifier un événement</h2>
+    <form action="modifier_evenement.php" method="post">
+        <!-- Sélection de l'événement à modifier -->
+        <label for="modifier_evenement">Choisir un événement à modifier :</label>
+        <select id="modifier_evenement" name="id_evenement" required>
+            <?php foreach ($evenements as $evenement): ?>
+                <option value="<?php echo $evenement['id_evenements']; ?>"><?php echo $evenement['titre']; ?></option>
+            <?php endforeach; ?>
+        </select>
+        <!-- Champs pour les nouveaux détails de l'événement -->
+        <label for="nouveau_titre">Nouveau titre :</label>
+        <input type="text" id="nouveau_titre" name="nouveau_titre" required><br>
+        <label for="nouvelle_date">Nouvelle date :</label>
+        <input type="date" id="nouvelle_date" name="nouvelle_date" required><br>
+        <label for="nouvelle_description">Nouvelle description :</label>
+        <input type="text" id="nouvelle_description" name="nouvelle_description" required><br>
+        <label for="nouveau_nb_places">Nouveau nombre de places :</label>
+        <input type="number" id="nouveau_nb_places" name="nouveau_nb_places" required><br>
+        <label for="nouvelle_image">Nouvelle image :</label>
+        <input type="file" id="nouvelle_image" name="nouvelle_image" accept="image/*" required><br>
+        <input type="submit" value="Modifier">
+    </form>
 
-        function closePopup() {
-            document.getElementById("popup").style.display = "none";
-            document.getElementById("overlay").style.display = "none";
-        }
-
-        window.onload = function() {
-            var message = "<?php echo $message; ?>";
-            if (message !== "") {
-                openPopup();
-            }
-        };
-    </script>
+   
+    <h2>Supprimer un événement</h2>
+    <form action="supprimer_evenement.php" method="post">
+        
+        <label for="supprimer_evenement">Choisir un événement à supprimer :</label>
+        <select id="supprimer_evenement" name="id_evenement" required>
+            <?php foreach ($evenements as $evenement): ?>
+                <option value="<?php echo $evenement['id_evenements']; ?>"><?php echo $evenement['titre']; ?></option>
+            <?php endforeach; ?>
+        </select>
+        <input type="submit" value="Supprimer">
+    </form>
 </body>
 </html>
+
+

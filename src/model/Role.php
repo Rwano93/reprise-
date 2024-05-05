@@ -34,4 +34,3 @@ class Role {
         return $this->libelle;
     }
 }
-?>
