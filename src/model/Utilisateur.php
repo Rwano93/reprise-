@@ -6,7 +6,7 @@ private $id_user;
 private $nom;
 private $prenom;
 private $email;
-private $motDePasse; 
+private $mdp; 
 private $ref_role; 
 
 public function __construct(array $donnees) {
@@ -38,8 +38,8 @@ public function setEmail(string $email) {
     $this->email = $email;
 }
 
-public function setMotDePasse(string $motDePasse) {
-    $this->motDePasse = $motDePasse;
+public function setMdp(string $mdp) {
+    $this->mdp = $mdp;
 }
 
 public function setRef_role(int $ref_role) {
@@ -62,8 +62,8 @@ public function getEmail() {
     return $this->email;
 }
 
-public function getMotDePasse() {
-    return $this->motDePasse;
+public function getMdp() {
+    return $this->mdp;
 }
 
 public function getRef_role() {

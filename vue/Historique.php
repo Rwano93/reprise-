@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil</title>
+    <title>Historique des événements</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f5f5f5;
+            
         }
         .container {
             display: flex;
         }
         .sidebar {
-            width: 200px;
+            width: 250px;
             background-color: #333;
             color: #fff;
             padding: 20px;
@@ -28,10 +29,11 @@
             transition: width 0.3s;
         }
         .sidebar:hover {
-            width: 250px;
+            width: 300px;
         }
         .sidebar h2 {
             margin-top: 0;
+            text-align: center;
         }
         .sidebar ul {
             list-style-type: none;
@@ -53,7 +55,7 @@
             background-color: #444;
         }
         .content {
-            margin-left: 200px;
+            margin-left: 250px;
             padding: 20px;
         }
         h1 {
@@ -65,73 +67,25 @@
             padding: 20px;
             background-color: #f9f9f9;
             border-radius: 8px;
+            transition: transform 0.3s ease-in-out;
+        }
+        .event:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .event h2 {
             margin-top: 0;
             color: #666;
-        }
-        form {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        form label {
-            display: block;
+            font-size: 18px;
             margin-bottom: 10px;
-            color: #333;
         }
-        form input[type="text"],
-        form input[type="email"],
-        form select {
-            width: 100%;
-            padding: 10px;
+        .event p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #444;
+        }
+        .event-details {
             margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        form input[type="submit"] {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        form input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        .popup-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-        }
-        .popup-content h2 {
-            margin-top: 0;
-            color: #333;
-        }
-        .popup-content button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .popup-content button:hover {
-            background-color: #0056b3;
         }
     </style>
 </head>
@@ -141,65 +95,44 @@
         <div class="sidebar">
             <h2>Menu</h2>
             <ul>
-                <li><a href="index.php">Evenements</a></li>
-                <li><a href="Historique.php">Historique d'événements</a></li>
+                <li><a href="index.php">Accueil</a></li>
+                <li><a href="Historique.php">Historique</a></li>
+                <li><a href="contact.php">Contact</a></li>
                 <li><a href="connexion.html">Déconnexion</a></li>
             </ul>
         </div>
 
         <!-- Contenu principal -->
         <div class="content">
-            <h1>Événements</h1>
+            <h1>Historique des Événements</h1>
             
-            <!-- Première événement -->
-            <div class="event">
-                <h2>Événement 1</h2>
-                <p>Description de l'événement 1.</p>
-                <p>Date: 01/01/2025</p>
-                <button onclick="openPopup('inscriptionPopup')">Inscription</button>
-            </div>
+            <?php
+                // Inclure la classe de connexion à la base de données
+                require_once '../src/bdd/SQLConnexion.php';
 
-            <!-- Deuxième événement -->
-            <div class="event">
-                <h2>Événement 2</h2>
-                <p>Description de l'événement 2.</p>
-                <p>Date: 02/01/2025</p>
-                <button onclick="openPopup('inscriptionPopup')">Inscription</button>
-            </div>
+                // Instancier la connexion à la base de données
+                $connexion = new SQLConnexion();
 
-            <!-- Formulaire d'inscription dans un pop-up -->
-            <div id="inscriptionPopup" class="popup" style="display: none;">
-                <div class="popup-content">
-                    <h2>S'inscrire à un événement</h2>
-                    <form action="#" method="post">
-                        <label for="name">Nom:</label>
-                        <input type="text" id="name" name="name" required>
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
-                        <label for="event">Choisir un événement:</label>
-                        <select id="event" name="event" required>
-                            <option value="event1">Événement 1</option>
-                            <option value="event2">Événement 2</option>
-                        </select>
-                        <input type="submit" value="S'inscrire">
-                    </form>
-                    <button onclick="closePopup('inscriptionPopup')">Fermer</button>
-                </div>
-            </div>
+                // Récupérer les événements depuis la base de données
+                $stmt = $connexion->bdd()->query("SELECT * FROM evenements ORDER BY titre");
+                $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Vérifier s'il y a des événements
+                if ($evenements) {
+                    foreach ($evenements as $evenement) {
+                        echo '<div class="event">';
+                        echo '<div class="event-details">';
+                        echo '<h2>' . $evenement['titre'] . '</h2>';
+                        echo '<p>Description: ' . $evenement['description'] . '</p>';
+                        echo '<p>Date: ' . $evenement['date'] . '</p>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                } else {
+                    echo '<p>Aucun événement trouvé.</p>';
+                }
+            ?>
         </div>
     </div>
-
-    <!-- JavaScript pour gérer l'ouverture/fermeture du pop-up -->
-    <script>
-        function openPopup(popupId) {
-            var popup = document.getElementById(popupId);
-            popup.style.display = "flex";
-        }
-
-        function closePopup(popupId) {
-            var popup = document.getElementById(popupId);
-            popup.style.display = "none";
-        }
-    </script>
 </body>
 </html>

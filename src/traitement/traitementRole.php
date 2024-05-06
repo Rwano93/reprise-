@@ -2,6 +2,9 @@
 
 include '../controleur/RoleControlleur.php';
 include '../model/Role.php';
+include '../bdd/SQLConnexion.php';
+
+
 
 $controlleur = new RoleControlleur();
 

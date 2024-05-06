@@ -1,15 +1,14 @@
 <?php
-// Inclure la classe de connexion à la base de données
-require_once '../src/bdd/SQLConnexion.php';
+    // Inclure la classe de connexion à la base de données
+    require_once '../src/bdd/SQLConnexion.php';
 
-// Instancier la connexion à la base de données
-$connexion = new SQLConnexion();
+    // Instancier la connexion à la base de données
+    $connexion = new SQLConnexion();
 
-// Récupérer les événements depuis la base de données
-$stmt = $connexion->bdd()->query("SELECT * FROM evenements");
-$evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Récupérer les événements depuis la base de données
+    $stmt = $connexion->bdd()->query("SELECT * FROM evenements");
+    $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -18,17 +17,18 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accueil</title>
     <style>
+        /* Votre CSS ici */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 50px; /* Correction : Ajout de 'px' */
             background-color: #f5f5f5;
         }
         .container {
             display: flex;
         }
         .sidebar {
-            width: 200px;
+            width: 250px;
             background-color: #333;
             color: #fff;
             padding: 20px;
@@ -41,10 +41,11 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
             transition: width 0.3s;
         }
         .sidebar:hover {
-            width: 250px;
+            width: 300px;
         }
         .sidebar h2 {
             margin-top: 0;
+            text-align: center;
         }
         .sidebar ul {
             list-style-type: none;
@@ -66,7 +67,7 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background-color: #444;
         }
         .content {
-            margin-left: 200px;
+            margin: 0 auto;
             padding: 20px;
         }
         h1 {
@@ -80,6 +81,11 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border-radius: 8px;
             display: flex;
             align-items: center;
+            transition: transform 0.3s;
+        }
+        .event:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .event h2 {
             margin-top: 0;
@@ -92,6 +98,7 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         .event-details {
             flex: 1;
+            text-align: center; /* Centre les informations */
         }
         .event-image {
             margin-left: 20px;
@@ -122,6 +129,7 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
+            transition: background-color 0.3s;
         }
         form input[type="submit"]:hover {
             background-color: #0056b3;
@@ -155,28 +163,61 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
+            transition: background-color 0.3s;
         }
         .popup-content button:hover {
             background-color: #0056b3;
         }
+        
+        
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+        
+        .places-restantes {
+            color: green;
+        }
+
+        .places-restantes-full {
+            color: red;
+        }
+
     </style>
 </head>
 <body>
-    <div id="overlay" class="popup" style="display: none;"></div>
-    <div id="popup" class="popup" style="display: none;">
-        <div class="popup-content">
-            <h2>Message</h2>
-            <p><?php echo $message; ?></p>
-            <button onclick="closePopup()">Fermer</button>
-        </div>
-    </div>  
-
+    
+<div id="inscriptionPopup" class="popup" style="display: none;">
+    <div class="popup-content">
+        <h2>Inscription</h2>
+        <form id="inscriptionForm" method="post">
+            <label for="prenom">Prénom :</label>
+            <input type="text" id="prenom" name="prenom" required><br><br>
+            <label for="email">E-mail :</label>
+            <input type="email" id="email" name="email" required><br><br>
+            <input type="submit" value="S'inscrire">
+        </form>
+        <button id="closeButton">Fermer</button>
+    </div>
+</div>
     <div class="container">
         <div class="sidebar">
             <h2>Menu</h2>
             <ul>
-                <li><a href="index.php">Evenements</a></li>
-                <li><a href="Historique.php">Historique d'événements</a></li>
+                <li><a href="index.php">Accueil</a></li>
+                <li><a href="historique.php">Historique</a></li>
+                <li><a href="contact.php">Contact</a></li>
                 <li><a href="connexion.html">Déconnexion</a></li>
             </ul>
         </div>
@@ -193,7 +234,25 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <h2><?php echo $evenement['titre']; ?></h2>
                     <p><?php echo $evenement['description']; ?></p>
                     <p>Date: <?php echo $evenement['date']; ?></p>
-                    <button onclick="openPopup('inscriptionPopup')">Inscription</button>
+                    <?php
+                        // Calcul du compte à rebours
+                        $dateEvenement = new DateTime($evenement['date']);
+                        $maintenant = new DateTime();
+                        $diff = $dateEvenement->diff($maintenant);
+                        $joursRestants = $diff->format('%a');
+                        
+                        // Récupérer le nombre de places réservées pour cet événement
+                        $stmt = $connexion->bdd()->prepare("SELECT COUNT(*) AS total FROM reserver WHERE ref_evenements = ?");
+                        $stmt->execute([$evenement['id_evenements']]);
+                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $placesReservees = $row['total'];
+                        
+                        // Calculer le nombre de places restantes
+                        $placesRestantes = $evenement['nb_places'] - $placesReservees;
+                    ?>
+                    <p>Places restantes: <?php echo $placesRestantes; ?></p>
+                    <p>Jours restants: <?php echo $joursRestants; ?></p>
+                    <button class="button">Réserver</button>
                 </div>
                 <!-- Image de l'événement -->
                 <div class="event-image">
@@ -201,21 +260,9 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
             <?php endforeach; ?>
-            
-            <div id="inscriptionPopup" class="popup" style="display: none;">
-                <div class="popup-content">
-                    <h2>S'inscrire à un événement</h2>
-                    <form action="#" method="post">
-                    <label for="name">Nom:</label>
-                    <input type="text" id="name" name="name" required placeholder="Votre nom :">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required placeholder="Votre adresse email :">
-                    <input type="submit" value="S'inscrire">
-                    </form>
-                <button onclick="closePopup('inscriptionPopup')">Fermer</button>
+        </div>
     </div>
-</div>
-    </div>
+
     <script>
         function openPopup(popupId) {
             var popup = document.getElementById(popupId);
@@ -227,6 +274,17 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
             popup.style.display = "none";
         }
 
+        var buttons = document.querySelectorAll(".button");
+
+        buttons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                openPopup("inscriptionPopup");
+            });
+        });
+
+        document.getElementById("closeButton").addEventListener("click", function() {
+            closePopup("inscriptionPopup");
+        });
     </script>
 </body>
 </html>

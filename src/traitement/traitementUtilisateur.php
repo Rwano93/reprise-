@@ -6,30 +6,29 @@ include '../bdd/SQLConnexion.php';
 
 $controlleur = new UtilisateurControlleur();
 
-
-if(isset($_POST["inscription"])) { 
-    $user = new Utilisateur($_POST); 
-    $success = $controlleur->inscription($user);
-    if($success) {
-        header('Location: ../../vue/index.php');
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST["inscription"])) {
+    $nom = $_POST['nom'];
+    $prenom = $_POST['prenom'];
+    $email = $_POST['email'];
+    $motDePasse = $_POST['mdp'];
+    $ref_role = 1; 
+    if ($controlleur->inscription($nom, $prenom, $email, $motDePasse, $ref_role)) {
+        header('Location: ../../vue/connexion.html');
         exit();
     } else {
-        header('Location: ../../vue/inscription.html');
-        exit();
+        echo 'Erreur lors de l\'inscription';
     }
 }
 
-if(isset($_POST["connexion"])) {
-    $user = new Utilisateur($_POST);
-    $success = $controlleur->connexion($user);
-    if($success) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST["connexion"])) {
+    $email = $_POST['email'];
+    $password = $_POST['mdp'];
+    $user = $controlleur->connexion($email, $mdp);
+    if ($user) {
         session_start();
-        $_SESSION['id_user'] = $user->getId_user();
-
-        $userId = $_SESSION['id_user']; 
-        $userRole = getUserRoleFromDatabase($userId); 
-        
-        if($userRole === 'Administrateur') {
+        $_SESSION['id_user'] = $user['id_user'];
+        $role = $user['ref_role'];
+        if ($role === 2) {
             header('Location: ../../vue/index_admin.php');
             exit();
         } else {
@@ -37,9 +36,7 @@ if(isset($_POST["connexion"])) {
             exit();
         }
     } else {
-        
-        header('Location: ../../vue/connexion.html');
-        exit();
+        echo 'Email ou mot de passe invalide';
     }
 }
 
@@ -54,7 +51,5 @@ function getUserRoleFromDatabase($userId) {
     $stmt = $connexion->bdd()->prepare('SELECT r.libelle FROM role r JOIN user u ON r.id_role = u.ref_role WHERE u.id_user = :id');
     $stmt->execute(['id' => $userId]);
     $result = $stmt->fetch();
-    return $result['libelle'];
+    return $result['libelle'] === '2' ? 'Administrateur' : 'Utilisateur';
 }
-
-

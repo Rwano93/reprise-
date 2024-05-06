@@ -11,7 +11,7 @@ try {
     echo "Erreur de connexion : " . $e->getMessage();
 }
 
-// Traitement du téléchargement de l'image
+
 if (isset($_FILES['image'])) {
     if ($_FILES['image']['error'] == 0) {
         $target_dir = 'uploads/';
@@ -29,13 +29,11 @@ if (isset($_FILES['image'])) {
     }
 }
 
-// Récupération des autres données du formulaire
 $titre = $_POST['titre'];
 $date = $_POST['date'];
 $description = $_POST['description'];
 
-// Insertion des données dans la base de données
 $stmt = $pdo->prepare("INSERT INTO evenements (titre, date, description, image) VALUES (?, ?, ?, ?)");
 $stmt->execute([$titre, $date, $description, $imagePath]);
 echo 'Événement ajouté avec succès !';
-?>
+

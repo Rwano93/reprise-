@@ -42,7 +42,7 @@ class Evenement {
         $this->nb_places = $nb_places;
     }
 
-    public function setImage(string $image) {
+    public function setImage(?string $image) { 
         $this->image = $image;
     }
 
