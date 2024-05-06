@@ -10,6 +10,7 @@ $stmt = $connexion->bdd()->query("SELECT * FROM evenements");
 $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -161,84 +162,71 @@ $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
-<div class="popup" id="popup">
-        <h3>Confirmation</h3>
-        <p><?php echo $message; ?></p>
-        <button onclick="closePopup()">Fermer</button>
-    </div>
-    <div class="overlay" id="overlay"></div>
-        <div class="container">
-            
-            <div class="sidebar">
-                <h2>Menu</h2>
-                <ul>
-                    <li><a href="index.php">Evenements</a></li>
-                    <li><a href="Historique.php">Historique d'événements</a></li>
-                    <li><a href="connexion.html">Déconnexion</a></li>
-                </ul>
-            </div>
-
-            <!-- Contenu principal -->
-            <div class="content">
-                <h1>Événements</h1>
-                
-                <!-- Affichage des événements depuis la base de données -->
-                <?php foreach ($evenements as $evenement): ?>
-                <div class="event">
-                    <!-- Détails de l'événement -->
-                    <div class="event-details">
-                        <h2><?php echo $evenement['titre']; ?></h2>
-                        <p><?php echo $evenement['description']; ?></p>
-                        <p>Date: <?php echo $evenement['date']; ?></p>
-                        <button onclick="openPopup('inscriptionPopup')">Inscription</button>
-                    </div>
-                    <!-- Image de l'événement -->
-                    <div class="event-image">
-                        <img src="<?php echo $evenement['image']; ?>" alt="Image de l'événement">
-                    </div>
-                </div>
-                <?php endforeach; ?>
-
-                <!-- Formulaire d'inscription dans un pop-up -->
-                <div id="inscriptionPopup" class="popup" style="display: none;">
-                    <div class="popup-content">
-                        <h2>S'inscrire à un événement</h2>
-                        <form action="#" method="post">
-                            <label for="name">Nom:</label>
-                            <input type="text" id="name" name="name" required>
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required>
-                            <label for="event">Choisir un événement:</label>
-                            <select id="event" name="event" required>
-                                <?php foreach ($evenements as $evenement): ?>
-                                <option value="<?php echo $evenement['id_evenements']; ?>"><?php echo $evenement['titre']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input type="submit" value="S'inscrire">
-                        </form>
-                        <button onclick="closePopup('inscriptionPopup')">Fermer</button>
-                    </div>
-                </div>
-            </div>
+    <div id="overlay" class="popup" style="display: none;"></div>
+    <div id="popup" class="popup" style="display: none;">
+        <div class="popup-content">
+            <h2>Message</h2>
+            <p><?php echo $message; ?></p>
+            <button onclick="closePopup()">Fermer</button>
         </div>
+    </div>  
+
+    <div class="container">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="index.php">Evenements</a></li>
+                <li><a href="Historique.php">Historique d'événements</a></li>
+                <li><a href="connexion.html">Déconnexion</a></li>
+            </ul>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="content">
+            <h1>Événements</h1>
+            
+            <!-- Affichage des événements depuis la base de données -->
+            <?php foreach ($evenements as $evenement): ?>
+            <div class="event">
+                <!-- Détails de l'événement -->
+                <div class="event-details">
+                    <h2><?php echo $evenement['titre']; ?></h2>
+                    <p><?php echo $evenement['description']; ?></p>
+                    <p>Date: <?php echo $evenement['date']; ?></p>
+                    <button onclick="openPopup('inscriptionPopup')">Inscription</button>
+                </div>
+                <!-- Image de l'événement -->
+                <div class="event-image">
+                    <img src="<?php echo $evenement['image']; ?>" alt="Image de l'événement">
+                </div>
+            </div>
+            <?php endforeach; ?>
+            
+            <div id="inscriptionPopup" class="popup" style="display: none;">
+                <div class="popup-content">
+                    <h2>S'inscrire à un événement</h2>
+                    <form action="#" method="post">
+                    <label for="name">Nom:</label>
+                    <input type="text" id="name" name="name" required placeholder="Votre nom :">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required placeholder="Votre adresse email :">
+                    <input type="submit" value="S'inscrire">
+                    </form>
+                <button onclick="closePopup('inscriptionPopup')">Fermer</button>
+    </div>
+</div>
     </div>
     <script>
-        function openPopup() {
-            document.getElementById("popup").style.display = "block";
-            document.getElementById("overlay").style.display = "block";
+        function openPopup(popupId) {
+            var popup = document.getElementById(popupId);
+            popup.style.display = "flex";
         }
 
-        function closePopup() {
-            document.getElementById("popup").style.display = "none";
-            document.getElementById("overlay").style.display = "none";
+        function closePopup(popupId) {
+            var popup = document.getElementById(popupId);
+            popup.style.display = "none";
         }
 
-        window.onload = function() {
-            var message = "<?php echo $message; ?>";
-            if (message !== "") {
-                openPopup();
-            }
-        };
     </script>
 </body>
 </html>
